@@ -2,7 +2,7 @@
 // @name         MadSchedule Exporter
 // @name:zh-CN   MadSchedule 课表导出助手
 // @namespace    mad-schedule
-// @version      1.0.1
+// @version      1.0.2
 // @description  Export the currently displayed UW–Madison Course Schedule to a json file that can be used in MadSchedule.
 // @description:zh-CN 将 UW–Madison 官方页面当前显示的课表导出为可在MadSchedule中导入的JSON文件。
 // @author       MadSchedule
