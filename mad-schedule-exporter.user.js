@@ -3,8 +3,8 @@
 // @name:zh-CN   MadSchedule 课表导出助手
 // @namespace    mad-schedule
 // @version      1.0.1
-// @description  Export the currently displayed UW–Madison Course Schedule to MadSchedule JSON (v1). Local-only, read-only.
-// @description:zh-CN 将 UW–Madison 官方页面当前显示的课表导出为 MadSchedule JSON v1 文件，仅在本地读取和下载。
+// @description  Export the currently displayed UW–Madison Course Schedule to a json file that can be used in MadSchedule.
+// @description:zh-CN 将 UW–Madison 官方页面当前显示的课表导出为可在MadSchedule中导入的JSON文件。
 // @author       MadSchedule
 // @license      MIT
 // @homepageURL  https://github.com/zzzhxxx/madschedule-exporter
@@ -198,7 +198,7 @@
     assert(snapshot.confirmedEmpty !== true || snapshot.courses.length === 0, '空课表声明与课程冲突');
     assert(snapshot.courses.length <= 500, '课程数量超出限制');
     assertNonempty([snapshot.id, snapshot.dataSpaceID, snapshot.term.id, snapshot.term.name,
-      snapshot.source.scopeID, snapshot.source.parserVersion, snapshot.source.pageIdentifier]);
+    snapshot.source.scopeID, snapshot.source.parserVersion, snapshot.source.pageIdentifier]);
     assert(isValidInstant(snapshot.source.extractedAt), '提取时间必须是 RFC 3339 时间点');
     assertUnique(snapshot.courses.map(c => c.id));
     assert(snapshot.issues.length <= 10000, '字段提示数量超限');
@@ -543,7 +543,7 @@
       assert(association == null || association !== '', '空课程关联键');
 
       const courseID = await stableIdentity([context.dataSpaceID, context.scopeID, termID, subject, number,
-        association == null ? 'unlinked-row' : 'enrollment', association ?? row.rowKey]);
+      association == null ? 'unlinked-row' : 'enrollment', association ?? row.rowKey]);
       const componentID = await stableIdentity([courseID, row.componentKey]);
 
       const meetings = row.meetings.map(m => ({ ...m }));
