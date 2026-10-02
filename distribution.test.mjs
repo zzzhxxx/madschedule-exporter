@@ -20,10 +20,12 @@ test('published metadata keeps installed identity and matches repository version
   const pkg = JSON.parse(read('./package.json'));
   assert.equal(value('name'), 'MadSchedule Exporter');
   assert.equal(value('namespace'), 'mad-schedule');
-  assert.equal(value('version'), pkg.version);
+  assert.equal(value('version'), pkg.version,
+    'Userscript @version must match package.json version; update both when releasing.');
   assert.equal(value('license'), pkg.license);
   assert.match(read('./LICENSE'), /^MIT License\n/);
-  assert.match(read('./CHANGELOG.md'), new RegExp(`^## ${pkg.version.replaceAll('.', '\\.')} —`, 'm'));
+  assert.match(read('./CHANGELOG.md'), new RegExp(`^## ${pkg.version.replaceAll('.', '\\.')} —`, 'm'),
+    `Add a CHANGELOG.md entry for version ${pkg.version} when releasing.`);
   assert.ok(value('description'));
   assert.ok(value('description:zh-CN'));
 });
