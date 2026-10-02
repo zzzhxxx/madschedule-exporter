@@ -1,0 +1,1013 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MadSchedule portable schedule document v1",
+  "$comment": "Frozen 2026-09-09. Additional semantic checks in docs/json-format.md are mandatory. Unknown object keys are ignored and not preserved. Source parseFailed is forbidden in persisted documents.",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "revision",
+    "dataSpaceID",
+    "snapshots"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "dataSpaceID": {
+      "$ref": "#/$defs/text"
+    },
+    "snapshots": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/snapshot"
+      },
+      "maxItems": 40
+    },
+    "academicCalendar": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/academicCalendar"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096,
+      "pattern": "\\S"
+    },
+    "date": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "format": "date"
+    },
+    "instant": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\\.[0-9]+)?(Z|[+-]([01][0-9]|2[0-3]):[0-5][0-9])$"
+    },
+    "timeRange": {
+      "type": "object",
+      "required": [
+        "start",
+        "end",
+        "endDayOffset"
+      ],
+      "properties": {
+        "start": {
+          "type": "string",
+          "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+        },
+        "end": {
+          "type": "string",
+          "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+        },
+        "endDayOffset": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "dateRange": {
+      "type": "object",
+      "required": [
+        "start",
+        "endInclusive"
+      ],
+      "properties": {
+        "start": {
+          "$ref": "#/$defs/date"
+        },
+        "endInclusive": {
+          "$ref": "#/$defs/date"
+        }
+      },
+      "additionalProperties": true
+    },
+    "textField": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "state",
+            "value"
+          ],
+          "properties": {
+            "state": {
+              "const": "known"
+            },
+            "value": {
+              "$ref": "#/$defs/text"
+            },
+            "sourceText": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "object",
+          "required": [
+            "state"
+          ],
+          "properties": {
+            "state": {
+              "type": "string",
+              "enum": [
+                "tba",
+                "arranged",
+                "notPublished",
+                "notProvided",
+                "notApplicable"
+              ]
+            },
+            "value": {
+              "type": "null"
+            },
+            "sourceText": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      ]
+    },
+    "datesField": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "state",
+            "value"
+          ],
+          "properties": {
+            "state": {
+              "const": "known"
+            },
+            "value": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/date"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            },
+            "sourceText": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "object",
+          "required": [
+            "state"
+          ],
+          "properties": {
+            "state": {
+              "type": "string",
+              "enum": [
+                "tba",
+                "arranged",
+                "notPublished",
+                "notProvided",
+                "notApplicable"
+              ]
+            },
+            "value": {
+              "type": "null"
+            },
+            "sourceText": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      ]
+    },
+    "weekdaysField": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "state",
+            "value"
+          ],
+          "properties": {
+            "state": {
+              "const": "known"
+            },
+            "value": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "mon",
+                  "tue",
+                  "wed",
+                  "thu",
+                  "fri",
+                  "sat",
+                  "sun"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 7,
+              "uniqueItems": true
+            },
+            "sourceText": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "object",
+          "required": [
+            "state"
+          ],
+          "properties": {
+            "state": {
+              "type": "string",
+              "enum": [
+                "tba",
+                "arranged",
+                "notPublished",
+                "notProvided",
+                "notApplicable"
+              ]
+            },
+            "value": {
+              "type": "null"
+            },
+            "sourceText": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      ]
+    },
+    "timeField": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "state",
+            "value"
+          ],
+          "properties": {
+            "state": {
+              "const": "known"
+            },
+            "value": {
+              "$ref": "#/$defs/timeRange"
+            },
+            "sourceText": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "object",
+          "required": [
+            "state"
+          ],
+          "properties": {
+            "state": {
+              "type": "string",
+              "enum": [
+                "tba",
+                "arranged",
+                "notPublished",
+                "notProvided",
+                "notApplicable"
+              ]
+            },
+            "value": {
+              "type": "null"
+            },
+            "sourceText": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      ]
+    },
+    "dateRangeField": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "state",
+            "value"
+          ],
+          "properties": {
+            "state": {
+              "const": "known"
+            },
+            "value": {
+              "$ref": "#/$defs/dateRange"
+            },
+            "sourceText": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "object",
+          "required": [
+            "state"
+          ],
+          "properties": {
+            "state": {
+              "type": "string",
+              "enum": [
+                "tba",
+                "arranged",
+                "notPublished",
+                "notProvided",
+                "notApplicable"
+              ]
+            },
+            "value": {
+              "type": "null"
+            },
+            "sourceText": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      ]
+    },
+    "meeting": {
+      "type": "object",
+      "required": [
+        "id",
+        "kind",
+        "weekdays",
+        "dates",
+        "time",
+        "dateRange",
+        "location",
+        "deliveryMode"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/text"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "weekly",
+            "specificDates",
+            "unscheduled"
+          ]
+        },
+        "weekdays": {
+          "$ref": "#/$defs/weekdaysField"
+        },
+        "dates": {
+          "$ref": "#/$defs/datesField"
+        },
+        "time": {
+          "$ref": "#/$defs/timeField"
+        },
+        "dateRange": {
+          "$ref": "#/$defs/dateRangeField"
+        },
+        "location": {
+          "$ref": "#/$defs/textField"
+        },
+        "deliveryMode": {
+          "$ref": "#/$defs/textField"
+        },
+        "onlineMode": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "synchronous",
+                "asynchronous"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "component": {
+      "type": "object",
+      "required": [
+        "id",
+        "officialID",
+        "type",
+        "section",
+        "session",
+        "meetings"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/text"
+        },
+        "officialID": {
+          "$ref": "#/$defs/textField"
+        },
+        "type": {
+          "$ref": "#/$defs/text"
+        },
+        "section": {
+          "$ref": "#/$defs/text"
+        },
+        "session": {
+          "$ref": "#/$defs/textField"
+        },
+        "meetings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/meeting"
+          },
+          "minItems": 1,
+          "maxItems": 500
+        }
+      },
+      "additionalProperties": true
+    },
+    "dateField": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "state",
+            "value"
+          ],
+          "properties": {
+            "state": {
+              "const": "known"
+            },
+            "value": {
+              "$ref": "#/$defs/date"
+            },
+            "sourceText": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "object",
+          "required": [
+            "state"
+          ],
+          "properties": {
+            "state": {
+              "type": "string",
+              "enum": [
+                "tba",
+                "arranged",
+                "notPublished",
+                "notProvided",
+                "notApplicable"
+              ]
+            },
+            "value": {
+              "type": "null"
+            },
+            "sourceText": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      ]
+    },
+    "exam": {
+      "type": "object",
+      "required": [
+        "id",
+        "componentIDs",
+        "date",
+        "time",
+        "location"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/text"
+        },
+        "componentIDs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/text"
+          },
+          "uniqueItems": true
+        },
+        "date": {
+          "$ref": "#/$defs/dateField"
+        },
+        "time": {
+          "$ref": "#/$defs/timeField"
+        },
+        "location": {
+          "$ref": "#/$defs/textField"
+        }
+      },
+      "additionalProperties": true
+    },
+    "examsField": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "state",
+            "value"
+          ],
+          "properties": {
+            "state": {
+              "const": "known"
+            },
+            "value": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/exam"
+              },
+              "maxItems": 500
+            },
+            "sourceText": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "object",
+          "required": [
+            "state"
+          ],
+          "properties": {
+            "state": {
+              "type": "string",
+              "enum": [
+                "tba",
+                "arranged",
+                "notPublished",
+                "notProvided",
+                "notApplicable"
+              ]
+            },
+            "value": {
+              "type": "null"
+            },
+            "sourceText": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      ]
+    },
+    "course": {
+      "type": "object",
+      "required": [
+        "id",
+        "termID",
+        "subject",
+        "catalogNumber",
+        "title",
+        "association",
+        "components",
+        "exams"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/text"
+        },
+        "termID": {
+          "$ref": "#/$defs/text"
+        },
+        "subject": {
+          "$ref": "#/$defs/text"
+        },
+        "catalogNumber": {
+          "$ref": "#/$defs/text"
+        },
+        "title": {
+          "$ref": "#/$defs/text"
+        },
+        "association": {
+          "$ref": "#/$defs/textField"
+        },
+        "components": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/component"
+          },
+          "minItems": 1,
+          "maxItems": 100
+        },
+        "exams": {
+          "$ref": "#/$defs/examsField"
+        }
+      },
+      "additionalProperties": true
+    },
+    "namedRange": {
+      "type": "object",
+      "required": [
+        "name",
+        "dates"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/text"
+        },
+        "dates": {
+          "$ref": "#/$defs/dateRange"
+        }
+      },
+      "additionalProperties": true
+    },
+    "termRule": {
+      "type": "object",
+      "required": [
+        "name",
+        "instruction",
+        "noInstruction",
+        "summerSessions"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/text"
+        },
+        "instruction": {
+          "$ref": "#/$defs/dateRange"
+        },
+        "exams": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/dateRange"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "noInstruction": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/namedRange"
+          }
+        },
+        "summerSessions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/namedRange"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "event": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "academicYear",
+        "dates",
+        "sourceDateText"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/text"
+        },
+        "title": {
+          "$ref": "#/$defs/text"
+        },
+        "academicYear": {
+          "$ref": "#/$defs/text"
+        },
+        "dates": {
+          "$ref": "#/$defs/dateRange"
+        },
+        "sourceDateText": {
+          "$ref": "#/$defs/text"
+        }
+      },
+      "additionalProperties": true
+    },
+    "academicCalendar": {
+      "type": "object",
+      "required": [
+        "sourceURL",
+        "fetchedAt",
+        "terms"
+      ],
+      "properties": {
+        "sourceURL": {
+          "const": "https://secfac.wisc.edu/academic-calendar/"
+        },
+        "fetchedAt": {
+          "$ref": "#/$defs/instant"
+        },
+        "terms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/termRule"
+          },
+          "minItems": 1,
+          "maxItems": 60
+        },
+        "events": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/event"
+              },
+              "minItems": 1,
+              "maxItems": 2000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "term": {
+      "type": "object",
+      "required": [
+        "id",
+        "officialID",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/text"
+        },
+        "officialID": {
+          "$ref": "#/$defs/textField"
+        },
+        "name": {
+          "$ref": "#/$defs/text"
+        },
+        "calendar": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/termRule"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "type",
+        "scopeID",
+        "evidence",
+        "pageIdentifier",
+        "parserVersion",
+        "extractedAt"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "uwWeb",
+            "scriptJSON",
+            "manual"
+          ]
+        },
+        "scopeID": {
+          "$ref": "#/$defs/text"
+        },
+        "evidence": {
+          "type": "string",
+          "enum": [
+            "livePage",
+            "syntheticFixture"
+          ]
+        },
+        "pageIdentifier": {
+          "$ref": "#/$defs/text"
+        },
+        "parserVersion": {
+          "$ref": "#/$defs/text"
+        },
+        "extractedAt": {
+          "$ref": "#/$defs/instant"
+        }
+      },
+      "additionalProperties": true
+    },
+    "issue": {
+      "type": "object",
+      "required": [
+        "path",
+        "message"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/text"
+        },
+        "message": {
+          "$ref": "#/$defs/text"
+        }
+      },
+      "additionalProperties": true
+    },
+    "snapshot": {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "id",
+        "dataSpaceID",
+        "timeZone",
+        "term",
+        "source",
+        "complete",
+        "confirmedEmpty",
+        "courses",
+        "issues"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "id": {
+          "$ref": "#/$defs/text"
+        },
+        "dataSpaceID": {
+          "$ref": "#/$defs/text"
+        },
+        "timeZone": {
+          "const": "America/Chicago"
+        },
+        "term": {
+          "$ref": "#/$defs/term"
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "complete": {
+          "const": true
+        },
+        "confirmedEmpty": {
+          "type": "boolean"
+        },
+        "courses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/course"
+          },
+          "maxItems": 500
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/issue"
+          },
+          "maxItems": 10000
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}
